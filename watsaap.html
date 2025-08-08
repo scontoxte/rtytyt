@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>quiz العقيدة الإسلامية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ccfbf1 100%);
+            min-height: 100vh;
+            direction: rtl;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1f2937;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-counter {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #059669;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .question-section {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 1.8rem;
+            color: #1f2937;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+            text-align: right;
+            position: relative;
+        }
+
+        .option:hover:not(.disabled) {
+            background-color: #f0fdf4;
+            border-color: #a7f3d0;
+        }
+
+        .option.correct {
+            background-color: #d1fae5;
+            border-color: #059669;
+            color: #047857;
+        }
+
+        .option.incorrect {
+            background-color: #fee2e2;
+            border-color: #dc2626;
+            color: #b91c1c;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .option-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        .next-btn {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .next-btn:hover {
+            background-color: #047857;
+        }
+
+        .score-display {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            color: #1f2937;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 4rem;
+            color: #059669;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .score-message {
+            font-size: 1.3rem;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .percentage {
+            font-size: 1.2rem;
+            color: #374151;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            background-color: #047857;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.5rem;
+            }
+            
+            .option {
+                padding: 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Quiz Section -->
+        <div id="quiz-section">
+            <div class="header">
+                <h1>quiz العقيدة الإسلامية</h1>
+                <div class="question-counter" id="question-counter">السؤال 1 من 10</div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 10%"></div>
+            </div>
+
+            <div class="question-section">
+                <div class="question" id="question-text">مَن رَبُّكَ؟</div>
+                <div class="options" id="options-container">
+                    <!-- Options will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <button class="next-btn hidden" id="next-btn" onclick="nextQuestion()">السؤال التالي</button>
+
+            <div class="score-display">
+                النقاط: <span id="current-score">0</span> من <span id="total-questions">10</span>
+            </div>
+        </div>
+
+        <!-- Student Info Section -->
+        <div id="student-info-section" class="hidden">
+            <div class="header">
+                <h2 class="result-title">معلومات الطالب</h2>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="student-name" style="display: block; margin-bottom: 10px; font-size: 1.2rem; color: #374151;">اسم الطالب:</label>
+                <input type="text" id="student-name" placeholder="أدخل اسمك هنا" style="width: 100%; padding: 15px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 1.1rem; text-align: right;">
+            </div>
+            <button class="next-btn" onclick="submitResults()">📤 إرسال النتائج للأستاذ</button>
+            <button class="restart-btn" onclick="restartQuiz()" style="margin-top: 15px;">🔄 إعادة الاختبار</button>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section" class="result-container hidden">
+            <div class="result-icon">🏆</div>
+            <h2 class="result-title">انتهى الاختبار</h2>
+            <div class="final-score" id="final-score">0/10</div>
+            <p class="score-message" id="score-message">يحتاج إلى مراجعة المادة مرة أخرى</p>
+            <div class="percentage" id="percentage">النسبة المئوية: 0%</div>
+            <div style="margin: 20px 0;">
+                <p style="color: #6b7280; font-size: 1.1rem;">تم إرسال نتائجك للأستاذ بنجاح! ✅</p>
+            </div>
+            <button class="restart-btn" onclick="restartQuiz()">🔄 إعادة الاختبار</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "مَن رَبُّكَ؟",
+                options: ["رَبِّي اللهُ", "رَبِّي مُحَمَّدٌ", "رَبِّي عِيسَى", "رَبِّي مُوسَى"],
+                correct: 0
+            },
+            {
+                question: "مَا دِينُكَ؟",
+                options: ["دِينِي المَسِيحِيَّةُ", "دِينِي اليَهُودِيَّةُ", "دِينِي الإِسْلاَمُ", "دِينِي البُوذِيَّةُ"],
+                correct: 2
+            },
+            {
+                question: "مَن نَبِيُّكَ؟",
+                options: ["نَبِيِّي عِيسَى", "نَبِيِّي مُوسَى", "نَبِيِّي إِبْرَاهِيمُ", "نَبِيِّي مُحَمَّدٌ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ"],
+                correct: 3
+            },
+            {
+                question: "أَيْنَ اللهُ؟",
+                options: ["اللهُ فِي كُلِّ مَكَانٍ", "اللهُ فِي السَّمَاءِ عَلَى العَرْشِ اسْتَوَى", "اللهُ فِي الأَرْضِ", "اللهُ فِي البَحْرِ"],
+                correct: 1
+            },
+            {
+                question: "لِمَاذَا خَلَقَنَا اللهُ؟",
+                options: ["خَلَقَنَا لِلَّعِبِ", "خَلَقَنَا لِلْعَمَلِ", "خَلَقَنَا لِعِبَادَتِهِ وَحْدَهُ", "خَلَقَنَا لِلْمَالِ"],
+                correct: 2
+            },
+            {
+                question: "مَا هِيَ العِبَادَةُ؟",
+                options: ["العِبَادَةُ هِيَ الصَّلاَةُ فَقَط", "العِبَادَةُ هِيَ كُلُّ مَا يُحِبُّهُ اللهُ وَيَرْضَاهُ مِنَ الأَقْوَالِ وَالأَعْمَالِ الظَّاهِرَةِ وَالبَاطِنَةِ", "العِبَادَةُ هِيَ الصَّوْمُ فَقَط", "العِبَادَةُ هِيَ الحَجُّ فَقَط"],
+                correct: 1
+            },
+            {
+                question: "مَا أَعْظَمُ طَاعَةٍ؟",
+                options: ["أَعْظَمُ طَاعَةٍ هِيَ الصَّلاَةُ", "أَعْظَمُ طَاعَةٍ هِيَ الزَّكَاةُ", "أَعْظَمُ طَاعَةٍ هِيَ التَّوْحِيدُ", "أَعْظَمُ طَاعَةٍ هِيَ الحَجُّ"],
+                correct: 2
+            },
+            {
+                question: "مَا هُوَ التَّوْحِيدُ؟",
+                options: ["التَّوْحِيدُ هُوَ الصَّلاَةُ", "التَّوْحِيدُ هُوَ إِفْرَادُ اللهِ بِالعِبَادَةِ", "التَّوْحِيدُ هُوَ الصَّوْمُ", "التَّوْحِيدُ هُوَ الحَجُّ"],
+                correct: 1
+            },
+            {
+                question: "مَا أَعْظَمُ مَعْصِيَةٍ؟",
+                options: ["أَعْظَمُ مَعْصِيَةٍ هِيَ الكَذِبُ", "أَعْظَمُ مَعْصِيَةٍ هِيَ السَّرِقَةُ", "أَعْظَمُ مَعْصِيَةٍ هِيَ الشِّرْكُ", "أَعْظَمُ مَعْصِيَةٍ هِيَ الغِيبَةُ"],
+                correct: 2
+            },
+            {
+                question: "مَا مَعْنَى لاَ إِلَهَ إِلاَّ اللهُ؟",
+                options: ["لاَ إِلَهَ فِي السَّمَاءِ إِلاَّ اللهُ", "لاَ مَعْبُودَ بِحَقٍّ إِلاَّ اللهُ", "لاَ رَبَّ إِلاَّ اللهُ", "لاَ خَالِقَ إِلاَّ اللهُ"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let userAnswers = [];
+        
+        // رقم WhatsApp للأستاذ (ضع رقمك هنا)
+        const teacherWhatsApp = "+393270880803"; // غيّر هذا الرقم لرقمك!
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('question-counter').textContent = `السؤال ${currentQuestion + 1} من ${questions.length}`;
+            
+            const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progressPercentage + '%';
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.innerHTML = option;
+                optionDiv.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            document.getElementById('next-btn').classList.add('hidden');
+            answered = false;
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answered) return;
+
+            answered = true;
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+
+            // حفظ إجابة الطالب
+            userAnswers[currentQuestion] = {
+                question: question.question,
+                selectedAnswer: question.options[selectedIndex],
+                correctAnswer: question.options[question.correct],
+                isCorrect: selectedIndex === question.correct
+            };
+
+            options.forEach((option, index) => {
+                option.classList.add('disabled');
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                    option.innerHTML += '<span class="option-icon">✓</span>';
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                    option.innerHTML += '<span class="option-icon">✗</span>';
+                }
+            });
+
+            if (selectedIndex === question.correct) {
+                score++;
+                document.getElementById('current-score').textContent = score;
+            }
+
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('student-info-section').classList.remove('hidden');
+
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            document.getElementById('percentage').textContent = `النسبة المئوية: ${percentage}%`;
+
+            let message = "";
+            if (percentage >= 90) message = "ممتاز! إجابات رائعة جداً";
+            else if (percentage >= 80) message = "جيد جداً! أحسنت";
+            else if (percentage >= 70) message = "جيد! يمكنك تحسين أدائك";
+            else if (percentage >= 60) message = "مقبول، حاول مراجعة المادة";
+            else message = "يحتاج إلى مراجعة المادة مرة أخرى";
+
+            document.getElementById('score-message').textContent = message;
+        }
+
+        function submitResults() {
+            const studentName = document.getElementById('student-name').value.trim();
+            
+            if (!studentName) {
+                alert('يرجى كتابة اسمك أولاً');
+                return;
+            }
+
+            const percentage = Math.round((score / questions.length) * 100);
+            const currentDate = new Date().toLocaleString('ar-SA');
+            
+            // إنشاء رسالة WhatsApp مفصلة
+            let message = `📋 نتائج quiz العقيدة الإسلامية\n\n`;
+            message += `👤 الطالب: ${studentName}\n`;
+            message += `📅 التاريخ والوقت: ${currentDate}\n`;
+            message += `📊 النتيجة النهائية: ${score}/${questions.length} (${percentage}%)\n\n`;
+            
+            message += `📝 تفاصيل الإجابات:\n`;
+            message += `━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            
+            userAnswers.forEach((answer, index) => {
+                message += `السؤال ${index + 1}: ${answer.question}\n`;
+                message += `إجابة الطالب: ${answer.selectedAnswer}\n`;
+                message += `الإجابة الصحيحة: ${answer.correctAnswer}\n`;
+                message += `النتيجة: ${answer.isCorrect ? '✅ صحيحة' : '❌ خاطئة'}\n\n`;
+            });
+
+            // تشفير الرسالة لـ WhatsApp
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappURL = `https://wa.me/${teacherWhatsApp}?text=${encodedMessage}`;
+            
+            // فتح WhatsApp في تبويب جديد
+            window.open(whatsappURL, '_blank');
+            
+            // إظهار قسم النتائج النهائي
+            document.getElementById('student-info-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            userAnswers = [];
+            
+            document.getElementById('current-score').textContent = '0';
+            document.getElementById('student-name').value = '';
+            document.getElementById('quiz-section').classList.remove('hidden');
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('student-info-section').classList.add('hidden');
+            
+            loadQuestion();
+        }
+
+        // Initialize the quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
